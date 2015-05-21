@@ -8,9 +8,8 @@
 # as well as the VLAN ID that is backing that portgroup
 #
 # the code could benefit from speed optimizations here and there
-# my GetHostsPortgroups() is painfully slow
-# perhaps PropertyCollector could help here - I'm a n00b though, still learning
-#
+# my GetHostsPortgroups() is quite slow
+
 
 from __future__ import print_function
 from pyVim.connect import SmartConnect, Disconnect
@@ -21,7 +20,8 @@ import sys
 
 def GetVMHosts(content):
     print("Getting all ESX hosts ...")
-    host_view = content.viewManager.CreateContainerView(content.rootFolder, [vim.HostSystem], True)
+    host_view = content.viewManager.CreateContainerView(content.rootFolder, \
+                                                        [vim.HostSystem], True)
     obj = [host for host in host_view.view]
     host_view.Destroy()
     return obj
@@ -29,7 +29,8 @@ def GetVMHosts(content):
 
 def GetVMs(content):
     print("Getting all VMs ...")
-    vm_view = content.viewManager.CreateContainerView(content.rootFolder, [vim.VirtualMachine], True)
+    vm_view = content.viewManager.CreateContainerView(content.rootFolder, \
+                                                      [vim.VirtualMachine], True)
     obj = [vm for vm in vm_view.view]
     vm_view.Destroy()
     return obj
@@ -87,7 +88,8 @@ def GetVMNics(vm):
             if portGroup is None:
                 portGroup = 'NA'
             print(
-                '\t' + dev.deviceInfo.label + '->' + dev.macAddress + ' @ ' + vSwitch + '->' + portGroup + ' (VLAN ' + vlanId + ')')
+                '\t' + dev.deviceInfo.label + '->' + dev.macAddress + ' @ ' \
+                     + vSwitch + '->' + portGroup + ' (VLAN ' + vlanId + ')')
 
 
 def login():
@@ -119,3 +121,4 @@ def main():
 # Main section
 if __name__ == "__main__":
     sys.exit(main())
+
