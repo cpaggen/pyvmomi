@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 #
 # cpaggen - May 16 2015 - Proof of Concept (little to no error checks)
-# feel free to use/re-use/modify this code as you see fit
+#  - rudimentary args parser
+#  - GetHostsPortgroups() is quite slow; there is probably a better way
 #
-# pyVmomi script that queries all VMs on a vCenter and gets their vNICS
-# along with the portgroup they are attached to (vswitch or DVS)
-# as well as the VLAN ID that is backing that portgroup
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# the code could benefit from speed optimizations here and there
-# my GetHostsPortgroups() is quite slow
-
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import print_function
 from pyVim.connect import SmartConnect, Disconnect
@@ -20,7 +25,7 @@ import sys
 
 def GetVMHosts(content):
     print("Getting all ESX hosts ...")
-    host_view = content.viewManager.CreateContainerView(content.rootFolder, \
+    host_view = content.viewManager.CreateContainerView(content.rootFolder,
                                                         [vim.HostSystem], True)
     obj = [host for host in host_view.view]
     host_view.Destroy()
@@ -29,7 +34,7 @@ def GetVMHosts(content):
 
 def GetVMs(content):
     print("Getting all VMs ...")
-    vm_view = content.viewManager.CreateContainerView(content.rootFolder, \
+    vm_view = content.viewManager.CreateContainerView(content.rootFolder,
                                                       [vim.VirtualMachine], True)
     obj = [vm for vm in vm_view.view]
     vm_view.Destroy()
@@ -74,7 +79,7 @@ def GetVMNics(vm):
                     vlanId = str(pgObj.config.defaultPortConfig.vlan.vlanId)
                     vSwitch = str(dvs.name)
             else:
-                portGroup = dev.backing.network.namea
+                portGroup = dev.backing.network.name
                 vmHost = vm.runtime.host
                 # global variable hosts is a list, not a dict - I can't access it by key
                 host_pos = hosts.index(vmHost)
@@ -88,7 +93,7 @@ def GetVMNics(vm):
             if portGroup is None:
                 portGroup = 'NA'
             print(
-                '\t' + dev.deviceInfo.label + '->' + dev.macAddress + ' @ ' \
+                '\t' + dev.deviceInfo.label + '->' + dev.macAddress + ' @ '
                      + vSwitch + '->' + portGroup + ' (VLAN ' + vlanId + ')')
 
 
@@ -121,4 +126,3 @@ def main():
 # Main section
 if __name__ == "__main__":
     sys.exit(main())
-
